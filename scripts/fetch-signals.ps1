@@ -8,7 +8,8 @@ param(
     [int]$MaxPerSource = 6,
     [string]$SeenFile = ".\output\seen.json",
     [switch]$MarkSeen,
-    [int]$SecDays = 3
+    [int]$SecDays = 3,
+    [int]$InsiderDays = 3
 )
 
 . "$PSScriptRoot\seen-lib.ps1"
@@ -159,6 +160,57 @@ function Get-Sec([string]$ticker) {
     } catch { [void]$notes.Add("sec failed for ${ticker}: $($_.Exception.Message)"); @() }
 }
 
+# Insider transactions (SEC Form 4) for US domestic filers in the last $InsiderDays days.
+# Codes: P = open-market purchase, S = open-market sale, A = grant, M = option exercise, F = tax withholding, G = gift.
+# Only P and S are reported; a footnote or flag about a 10b5-1 plan marks pre-scheduled sales.
+function Get-Insider([string]$ticker) {
+    try {
+        if (-not $script:cikMap) { [void](Get-Sec $ticker) }
+        if (-not $script:cikMap.ContainsKey($ticker)) { return @() }
+        $cik = [int64]$script:cikMap[$ticker]
+        $s = Invoke-RestMethod -Uri ("https://data.sec.gov/submissions/CIK{0:D10}.json" -f $cik) -UserAgent $ua -TimeoutSec 20
+        $r = $s.filings.recent
+        $cut = (Get-Date).AddDays(-$InsiderDays).Date
+        $out = @()
+        for ($n = 0; $n -lt [Math]::Min(60, $r.form.Count); $n++) {
+            if ($r.form[$n] -ne '4' -or [datetime]$r.filingDate[$n] -lt $cut) { continue }
+            $acc = ($r.accessionNumber[$n] -replace '-', '')
+            $doc = ($r.primaryDocument[$n] -replace '^xsl[^/]+/', '')
+            $url = "https://www.sec.gov/Archives/edgar/data/$cik/$acc/$doc"
+            try {
+                # SEC's fair-access policy wants contact details in the user-agent for filing documents.
+                # It is read from the SEC_USER_AGENT user environment variable so no contact details are stored in the repo.
+                $secUa = [Environment]::GetEnvironmentVariable('SEC_USER_AGENT', 'User'); if (-not $secUa) { $secUa = $ua }
+                $x = [xml](Invoke-WebRequest -UseBasicParsing -Uri $url -UserAgent $secUa -TimeoutSec 20).Content
+                $o = $x.ownershipDocument
+                $name = Get-Txt $o.reportingOwner.reportingOwnerId.rptOwnerName
+                $rel = $o.reportingOwner.reportingOwnerRelationship
+                $title = if ((Get-Txt $rel.officerTitle)) { Get-Txt $rel.officerTitle } elseif ((Get-Txt $rel.isDirector) -match '1|true') { 'Director' } else { 'Owner' }
+                $plan = ((Get-Txt $o.aff10b5One) -match '1|true') -or ($x.OuterXml -match '10b5-1')
+                foreach ($t in @($o.nonDerivativeTable.nonDerivativeTransaction)) {
+                    if (-not $t) { continue }
+                    $code = Get-Txt $t.transactionCoding.transactionCode
+                    if ($code -notin 'P', 'S') { continue }
+                    $sh = [double](Get-Txt $t.transactionAmounts.transactionShares.value)
+                    $px = [double](Get-Txt $t.transactionAmounts.transactionPricePerShare.value)
+                    $out += [pscustomobject]@{ ticker = $ticker; filed = $r.filingDate[$n]; insider = $name; role = $title; action = $(if ($code -eq 'P') { 'bought' } else { 'sold' }); shares = $sh; price = $px; value_usd = [Math]::Round($sh * $px); planned_10b5_1 = $plan; link = $url }
+                }
+            } catch {
+                $m = "form4 parse failed ${ticker}: $($_.Exception.Message)"
+                if (-not $notes.Contains($m)) { [void]$notes.Add($m) }
+                break
+            }
+        }
+        # One row per insider, day and action: total shares, average price, total value.
+        $out | Group-Object filed, insider, action | ForEach-Object {
+            $g = $_.Group
+            $sh = ($g | Measure-Object shares -Sum).Sum
+            $val = ($g | Measure-Object value_usd -Sum).Sum
+            [pscustomobject]@{ ticker = $g[0].ticker; filed = $g[0].filed; insider = $g[0].insider; role = $g[0].role; action = $g[0].action; shares = $sh; avg_price = $(if ($sh) { [Math]::Round($val / $sh, 2) } else { 0 }); value_usd = $val; planned_10b5_1 = [bool]($g | Where-Object { $_.planned_10b5_1 }); link = $g[0].link }
+        }
+    } catch { [void]$notes.Add("insider failed for ${ticker}: $($_.Exception.Message)"); @() }
+}
+
 # Official rulemaking from the Federal Register, for policy items that need a primary source.
 function Get-FederalRegister([string[]]$terms) {
     foreach ($t in $terms) {
@@ -293,6 +345,7 @@ foreach ($item in $Items) {
         reddit = @(Get-Reddit $terms)
         reddit_buzz = $(if ($isUs) { Get-RedditBuzz $ticker } else { $null })
         sec    = if ($isUs) { @(Get-Sec $ticker) } else { @() }
+        insider = if ($isUs) { @(Get-Insider $ticker) } else { @() }
     }
     Start-Sleep -Milliseconds 600
 }

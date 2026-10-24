@@ -1,88 +1,105 @@
-<!-- Stock Watch email template. Structure and colours to reuse on every scheduled run.
-     Fill the {{...}} placeholders. Remove any section that has no items, except the header and footer.
-     Inline CSS only (email clients). Tier colours: red #b71c1c / #fdecea, amber #b26a00 / #fff4e0, blue #0d47a1 / #e8f1fd, grey #4b5563 / #f3f4f6.
-     Badges: Verified = green pill (#d1fae5 on #065f46); Unverified = amber pill (#fde68a on #7c4a00).
-     Impact arrows: &#9660; Negative (red), &#9650; Positive (green #166534), &#9644; Neutral (grey). -->
-<div style="background:#f3f4f6;padding:16px 0;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+<!-- Stock Watch email template v2. Structure and colours to reuse on every scheduled run.
+     Fill the {{...}} placeholders. Remove any section that has no items, except the header, heat table and footer.
+     Inline CSS only (email clients). Nothing personal is stored in this file: {{my_email}} is filled in at send time.
+     Tier colours: red #b71c1c / #fdecea, amber #b26a00 / #fff4e0, blue #0d47a1 / #e8f1fd, grey #4b5563 / #f3f4f6.
+     Badges: Verified = green pill (#d1fae5 on #065f46); Unverified = amber pill (#fde68a on #7c4a00); Official source = blue pill (#dbeafe on #1e40af).
+     Impact arrows: &#9660; Negative (red #b71c1c), &#9650; Positive (green #166534), &#9644; Neutral (grey #6b7280).
+     Day/5d/1m changes: coloured red if negative, green if positive, grey if within 0.2%.
+     Severity dots (impact and confidence): use &#9679; for filled and &#9675; for empty, three dots: e.g. &#9679;&#9679;&#9675;.
+     Keep the whole email to about two phone screens above the heat table. -->
+
+<!-- PREHEADER: hidden preview text shown by the inbox next to the subject. One line, the top items, under 90 characters. -->
+<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:#f3f4f6;">{{e.g. NIO flagged, chips mixed, 1 policy item}}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
+
+<div style="background:#f3f4f6;padding:12px 0;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
 <table role="presentation" width="640" align="center" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;">
 
-<tr><td style="background:#111827;color:#ffffff;padding:18px 22px;border-radius:8px 8px 0 0;">
+<!-- HEADER -->
+<tr><td style="background:#111827;color:#ffffff;padding:16px 18px;border-radius:8px 8px 0 0;">
 <div style="font-size:12px;letter-spacing:1px;color:#9ca3af;">STOCK WATCH</div>
-<div style="font-size:20px;font-weight:bold;margin-top:2px;">{{date}} &middot; {{scan name: Morning scan / US pre-market / US open}}</div>
+<div style="font-size:19px;font-weight:bold;margin-top:2px;">{{date}} &middot; {{scan name}}</div>
 <div style="font-size:12px;color:#9ca3af;margin-top:4px;">{{N}} stocks scanned &middot; new items only</div>
 </td></tr>
 
 <!-- TL;DR: one sentence on the overall picture and the single most important thing. -->
-<tr><td style="padding:14px 22px 0 22px;font-size:14px;line-height:1.45;color:#111827;"><b>{{one-sentence summary}}</b></td></tr>
+<tr><td style="padding:14px 18px 0 18px;font-size:15px;line-height:1.45;color:#111827;"><b>{{one-sentence summary}}</b></td></tr>
 
-<!-- MARKET SNAPSHOT: one cell per index from Quotes rows 49-58 (skip blanks). Day change coloured: red #b71c1c if negative, green #166534 if positive, grey if flat.
-     Cells: S&P 500, Nasdaq, Chips (SOX), Hang Seng, Nikkei, VIX, USD/SGD, Oil (USO proxy). Add "Oil via the USO fund" footnote. -->
-<tr><td style="padding:10px 22px 0 22px;">
+<!-- MARKET SNAPSHOT: one cell per index from Quotes rows 49-58 (skip blanks): S&amp;P 500, Nasdaq, Chips (SOX), Hang Seng, Nikkei, VIX, USD/SGD, Oil*. Add footnote "*Oil via the USO fund". -->
+<tr><td style="padding:10px 18px 0 18px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="3" style="font-size:11px;"><tr>
 <td align="center" style="background:#f3f4f6;border-radius:5px;padding:6px 2px;"><div style="color:#6b7280;">{{S&amp;P 500}}</div><div style="font-weight:bold;color:#b71c1c;">{{-0.5%}}</div></td>
 <!-- repeat the cell above for each index -->
 </tr></table>
 </td></tr>
 
-<!-- 52-WEEK RANGE BAR snippet, to place beside a stock's name (position = Quotes column H as a percent; 0 = at the yearly low, 100 = at the high):
-<table role="presentation" width="90" cellpadding="0" cellspacing="0" style="display:inline-table;vertical-align:middle;"><tr>
-<td width="{{pos}}%" style="height:6px;background:#d1d5db;font-size:0;line-height:0;">&nbsp;</td>
-<td width="4" style="height:6px;background:#111827;font-size:0;line-height:0;">&nbsp;</td>
-<td style="height:6px;background:#d1d5db;font-size:0;line-height:0;">&nbsp;</td></tr></table>
-<span style="font-size:10px;color:#6b7280;">52w {{pos}}%</span>
-Also show the day change next to the stock name, e.g. <b style="color:#b71c1c;">-0.3%</b>. -->
-
-<tr><td style="padding:12px 22px 4px 22px;">
+<!-- COUNTS -->
+<tr><td style="padding:10px 18px 4px 18px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="6"><tr>
-<td align="center" style="background:#fdecea;border-radius:6px;padding:10px;"><div style="font-size:22px;font-weight:bold;color:#b71c1c;">{{n_urgent}}</div><div style="font-size:11px;color:#b71c1c;">NEEDS ATTENTION</div></td>
-<td align="center" style="background:#fff4e0;border-radius:6px;padding:10px;"><div style="font-size:22px;font-weight:bold;color:#9a5b00;">{{n_watch}}</div><div style="font-size:11px;color:#9a5b00;">WATCH</div></td>
-<td align="center" style="background:#e8f1fd;border-radius:6px;padding:10px;"><div style="font-size:22px;font-weight:bold;color:#0d47a1;">{{n_info}}</div><div style="font-size:11px;color:#0d47a1;">INFO</div></td>
-<td align="center" style="background:#f3f4f6;border-radius:6px;padding:10px;"><div style="font-size:22px;font-weight:bold;color:#4b5563;">{{n_quiet}}</div><div style="font-size:11px;color:#4b5563;">QUIET</div></td>
+<td align="center" style="background:#fdecea;border-radius:6px;padding:9px;"><div style="font-size:21px;font-weight:bold;color:#b71c1c;">{{n_urgent}}</div><div style="font-size:10px;color:#b71c1c;">NEEDS ATTENTION</div></td>
+<td align="center" style="background:#fff4e0;border-radius:6px;padding:9px;"><div style="font-size:21px;font-weight:bold;color:#9a5b00;">{{n_watch}}</div><div style="font-size:10px;color:#9a5b00;">WATCH</div></td>
+<td align="center" style="background:#e8f1fd;border-radius:6px;padding:9px;"><div style="font-size:21px;font-weight:bold;color:#0d47a1;">{{n_info}}</div><div style="font-size:10px;color:#0d47a1;">INFO</div></td>
+<td align="center" style="background:#f3f4f6;border-radius:6px;padding:9px;"><div style="font-size:21px;font-weight:bold;color:#4b5563;">{{n_quiet}}</div><div style="font-size:10px;color:#4b5563;">QUIET</div></td>
 </tr></table>
+<div style="font-size:11px;color:#6b7280;margin-top:4px;">Dots: impact &#9679;&#9679;&#9679; = large, confidence &#9679;&#9679;&#9679; = well confirmed.</div>
 </td></tr>
 
-<!-- NEEDS ATTENTION: one card per item. Fields: Reported / Why it matters / Likely impact / Check next. -->
-<tr><td style="padding:14px 22px 0 22px;">
+<!-- NEEDS ATTENTION: one card per item (max 2). -->
+<tr><td style="padding:12px 18px 0 18px;">
 <div style="background:#b71c1c;color:#ffffff;padding:8px 12px;border-radius:6px 6px 0 0;font-size:13px;font-weight:bold;">&#9888; NEEDS ATTENTION</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #f5c2c0;border-top:none;border-radius:0 0 6px 6px;background:#fffafa;">
 <tr><td style="padding:12px;">
-<div style="font-size:15px;font-weight:bold;">{{stock}} <span style="background:#d1fae5;color:#065f46;font-size:11px;padding:2px 7px;border-radius:10px;margin-left:6px;">{{Verified|Unverified}}</span> <span style="color:#b71c1c;font-size:12px;margin-left:6px;">&#9660; Negative</span></div>
-<div style="font-size:12px;color:#6b7280;margin:2px 0 8px 0;">{{holding at Tiger/DBS or watchlist; no amounts}}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;line-height:1.45;">
-<tr><td width="92" valign="top" style="color:#6b7280;padding:2px 0;">Reported</td><td>{{what, with source name}}</td></tr>
-<tr><td valign="top" style="color:#6b7280;padding:2px 0;">Why it matters</td><td>{{mechanism}}</td></tr>
-<tr><td valign="top" style="color:#6b7280;padding:2px 0;">Likely impact</td><td>{{direction, timeframe, conditional wording}}</td></tr>
-<tr><td valign="top" style="color:#6b7280;padding:2px 0;">Check next</td><td><b>{{one concrete action}}</b> {{details}}</td></tr>
-</table></td></tr></table>
+<div style="font-size:16px;font-weight:bold;">{{stock}} <span style="font-size:13px;color:#b71c1c;">{{-0.3%}} day</span> <span style="background:#d1fae5;color:#065f46;font-size:11px;padding:2px 7px;border-radius:10px;margin-left:4px;">{{Verified|Unverified|Official source}}</span></div>
+<div style="font-size:12px;color:#6b7280;margin:3px 0 8px 0;">{{holding at Tiger/DBS or watchlist; no amounts}} &middot; 5d {{-4.1%}} &middot; 1m {{-9.4%}} &middot; {{range bar, see snippet}}</div>
+<div style="font-size:12px;color:#374151;margin-bottom:8px;">Impact <span style="color:#b71c1c;">&#9679;&#9679;&#9675;</span> &nbsp; Confidence <span style="color:#6b7280;">&#9679;&#9675;&#9675;</span> &nbsp; Direction <span style="color:#b71c1c;">&#9660; Negative</span></div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;line-height:1.45;">
+<tr><td width="92" valign="top" style="color:#6b7280;padding:3px 0;">Reported</td><td>{{what, with source name}} <a href="{{url}}" style="color:#1d4ed8;">Read &rarr;</a></td></tr>
+<tr><td valign="top" style="color:#6b7280;padding:3px 0;">Why it matters</td><td>{{mechanism}}</td></tr>
+<tr><td valign="top" style="color:#6b7280;padding:3px 0;">Likely impact</td><td>{{direction, timeframe, conditional wording}}</td></tr>
+<tr><td valign="top" style="color:#6b7280;padding:3px 0;">Check next</td><td><b>{{one concrete action}}</b> {{details}}</td></tr>
+</table>
+<div style="font-size:12px;margin-top:8px;color:#6b7280;">Was this useful? <a href="mailto:{{my_email}}?subject=SW-FB%20useful%20{{TICKER}}%20{{date}}" style="color:#166534;">&#128077; Yes</a> &nbsp; <a href="mailto:{{my_email}}?subject=SW-FB%20not-useful%20{{TICKER}}%20{{date}}" style="color:#b71c1c;">&#128078; No</a></div>
+</td></tr></table>
 </td></tr>
 
-<!-- WATCH: table, one row per item. -->
-<tr><td style="padding:16px 22px 0 22px;">
+<!-- WATCH: stacked cards (phone friendly), one block per item, max 5. -->
+<tr><td style="padding:14px 18px 0 18px;">
 <div style="background:#b26a00;color:#ffffff;padding:8px 12px;border-radius:6px 6px 0 0;font-size:13px;font-weight:bold;">&#128065; WATCH</div>
-<table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="font-size:12.5px;line-height:1.4;border:1px solid #f3d9a8;border-top:none;background:#fffaf0;">
-<tr style="background:#fdebc8;color:#7c4a00;"><td width="16%"><b>Stock</b></td><td width="40%"><b>What and why</b></td><td width="16%"><b>Impact</b></td><td width="28%"><b>Check next</b></td></tr>
-<tr style="border-top:1px solid #f3d9a8;"><td valign="top"><b>{{stock}}</b></td><td valign="top">{{what and why}} {{status badge}}</td><td valign="top">{{arrow + word}}</td><td valign="top">{{check}}</td></tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #f3d9a8;border-top:none;border-radius:0 0 6px 6px;background:#fffaf0;">
+<tr><td style="padding:10px 12px;border-top:1px solid #f3d9a8;">
+<div style="font-size:14px;font-weight:bold;">{{stock}} <span style="font-size:12px;color:#b71c1c;">{{-0.3%}} day</span> <span style="font-size:12px;color:#6b7280;">&middot; 5d {{-4.1%}}</span> <span style="background:#fde68a;color:#7c4a00;font-size:10px;padding:1px 6px;border-radius:8px;margin-left:4px;">{{Unverified}}</span></div>
+<div style="font-size:13px;line-height:1.45;margin-top:3px;">{{what and why in one or two sentences}}</div>
+<div style="font-size:12px;color:#374151;margin-top:4px;">Impact <span style="color:#b71c1c;">&#9679;&#9675;&#9675;</span> &nbsp; Confidence <span style="color:#6b7280;">&#9679;&#9675;&#9675;</span> &nbsp; <b>Check:</b> {{check}} &nbsp; <a href="{{url}}" style="color:#1d4ed8;">Read &rarr;</a> &nbsp; <a href="mailto:{{my_email}}?subject=SW-FB%20useful%20{{TICKER}}%20{{date}}" style="color:#166534;">&#128077;</a> <a href="mailto:{{my_email}}?subject=SW-FB%20not-useful%20{{TICKER}}%20{{date}}" style="color:#b71c1c;">&#128078;</a></div>
+</td></tr>
 </table>
 </td></tr>
 
-<!-- INFO: two-column table, stock and one-to-two sentences. -->
-<tr><td style="padding:16px 22px 0 22px;">
+<!-- INFO: one row per item with a Read link. -->
+<tr><td style="padding:14px 18px 0 18px;">
 <div style="background:#0d47a1;color:#ffffff;padding:8px 12px;border-radius:6px 6px 0 0;font-size:13px;font-weight:bold;">&#8505; INFO</div>
-<table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="font-size:12.5px;line-height:1.4;border:1px solid #bcd3f5;border-top:none;background:#f7faff;">
-<tr><td width="16%" valign="top"><b>{{stock}}</b></td><td>{{one to two sentences}}</td></tr>
+<table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="font-size:13px;line-height:1.4;border:1px solid #bcd3f5;border-top:none;background:#f7faff;">
+<tr><td width="18%" valign="top"><b>{{stock}}</b></td><td>{{one to two sentences}} <a href="{{url}}" style="color:#1d4ed8;">Read &rarr;</a></td></tr>
 </table>
 </td></tr>
 
-<!-- QUIET: one line listing stocks with nothing notable. -->
-<tr><td style="padding:16px 22px 0 22px;">
-<div style="background:#4b5563;color:#ffffff;padding:8px 12px;border-radius:6px 6px 0 0;font-size:13px;font-weight:bold;">QUIET</div>
-<div style="border:1px solid #d1d5db;border-top:none;background:#f9fafb;padding:10px 12px;font-size:12.5px;line-height:1.5;color:#374151;">No notable news: <b>{{list}}</b>.</div>
+<!-- HEAT TABLE: every tracked stock (Quotes rows 5-45 with a code), so quiet names are visible too. Sorted by day change, worst first.
+     Columns: Stock | Day | 5d | 1m | 52-week range bar | News dot (red/amber/blue dot if it appears above, grey dash if quiet).
+     Cell background tint for Day: light red if below -2%, light green if above +2%, none otherwise. Show "n/a" for stocks without a price. -->
+<tr><td style="padding:14px 18px 0 18px;">
+<div style="background:#374151;color:#ffffff;padding:8px 12px;border-radius:6px 6px 0 0;font-size:13px;font-weight:bold;">ALL STOCKS</div>
+<table role="presentation" width="100%" cellpadding="5" cellspacing="0" style="font-size:12px;border:1px solid #d1d5db;border-top:none;">
+<tr style="background:#f3f4f6;color:#4b5563;"><td><b>Stock</b></td><td align="right"><b>Day</b></td><td align="right"><b>5d</b></td><td align="right"><b>1m</b></td><td><b>52w range</b></td><td align="center"><b>News</b></td></tr>
+<tr style="border-top:1px solid #e5e7eb;"><td><b>{{ticker}}</b></td><td align="right" style="color:#b71c1c;">{{-0.3%}}</td><td align="right" style="color:#b71c1c;">{{-4.1%}}</td><td align="right" style="color:#b71c1c;">{{-9.4%}}</td>
+<td><table role="presentation" width="70" cellpadding="0" cellspacing="0"><tr><td width="{{pos}}%" style="height:6px;background:#d1d5db;font-size:0;line-height:0;">&nbsp;</td><td width="4" style="height:6px;background:#111827;font-size:0;line-height:0;">&nbsp;</td><td style="height:6px;background:#d1d5db;font-size:0;line-height:0;">&nbsp;</td></tr></table></td>
+<td align="center" style="color:#b71c1c;">&#9679;</td></tr>
+</table>
+<div style="font-size:11px;color:#6b7280;margin-top:4px;">52w bar: marker at the left means near the yearly low, at the right near the yearly high.</div>
 </td></tr>
 
-<tr><td style="padding:16px 22px 20px 22px;">
+<!-- FOOTER -->
+<tr><td style="padding:14px 18px 18px 18px;">
 <div style="font-size:12px;color:#6b7280;line-height:1.5;">
 <b style="color:#374151;">Verification:</b> {{what could not be confirmed, which sources failed this run}}<br>
-<b style="color:#374151;">Coverage:</b> news (2 engines), SEC filings, Federal Register, Reddit mention counts only. X not covered.<br>
+<b style="color:#374151;">Coverage:</b> news (2 engines), direct feeds (Truth Social mirror, White House, Fed, SEC, CnEVPost, SCMP, CNBC, MarketWatch, Singapore press), SEC filings, Federal Register, Reddit mention counts only. X not covered. No Singapore prices.<br>
 Facts and context only, not buy/sell advice. Decisions are yours.
 </div></td></tr>
 </table></div>
