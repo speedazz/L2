@@ -1,0 +1,88 @@
+<!-- Stock Watch email template. Structure and colours to reuse on every scheduled run.
+     Fill the {{...}} placeholders. Remove any section that has no items, except the header and footer.
+     Inline CSS only (email clients). Tier colours: red #b71c1c / #fdecea, amber #b26a00 / #fff4e0, blue #0d47a1 / #e8f1fd, grey #4b5563 / #f3f4f6.
+     Badges: Verified = green pill (#d1fae5 on #065f46); Unverified = amber pill (#fde68a on #7c4a00).
+     Impact arrows: &#9660; Negative (red), &#9650; Positive (green #166534), &#9644; Neutral (grey). -->
+<div style="background:#f3f4f6;padding:16px 0;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+<table role="presentation" width="640" align="center" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;">
+
+<tr><td style="background:#111827;color:#ffffff;padding:18px 22px;border-radius:8px 8px 0 0;">
+<div style="font-size:12px;letter-spacing:1px;color:#9ca3af;">STOCK WATCH</div>
+<div style="font-size:20px;font-weight:bold;margin-top:2px;">{{date}} &middot; {{scan name: Morning scan / US pre-market / US open}}</div>
+<div style="font-size:12px;color:#9ca3af;margin-top:4px;">{{N}} stocks scanned &middot; new items only</div>
+</td></tr>
+
+<!-- TL;DR: one sentence on the overall picture and the single most important thing. -->
+<tr><td style="padding:14px 22px 0 22px;font-size:14px;line-height:1.45;color:#111827;"><b>{{one-sentence summary}}</b></td></tr>
+
+<!-- MARKET SNAPSHOT: one cell per index from Quotes rows 49-58 (skip blanks). Day change coloured: red #b71c1c if negative, green #166534 if positive, grey if flat.
+     Cells: S&P 500, Nasdaq, Chips (SOX), Hang Seng, Nikkei, VIX, USD/SGD, Oil (USO proxy). Add "Oil via the USO fund" footnote. -->
+<tr><td style="padding:10px 22px 0 22px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="3" style="font-size:11px;"><tr>
+<td align="center" style="background:#f3f4f6;border-radius:5px;padding:6px 2px;"><div style="color:#6b7280;">{{S&amp;P 500}}</div><div style="font-weight:bold;color:#b71c1c;">{{-0.5%}}</div></td>
+<!-- repeat the cell above for each index -->
+</tr></table>
+</td></tr>
+
+<!-- 52-WEEK RANGE BAR snippet, to place beside a stock's name (position = Quotes column H as a percent; 0 = at the yearly low, 100 = at the high):
+<table role="presentation" width="90" cellpadding="0" cellspacing="0" style="display:inline-table;vertical-align:middle;"><tr>
+<td width="{{pos}}%" style="height:6px;background:#d1d5db;font-size:0;line-height:0;">&nbsp;</td>
+<td width="4" style="height:6px;background:#111827;font-size:0;line-height:0;">&nbsp;</td>
+<td style="height:6px;background:#d1d5db;font-size:0;line-height:0;">&nbsp;</td></tr></table>
+<span style="font-size:10px;color:#6b7280;">52w {{pos}}%</span>
+Also show the day change next to the stock name, e.g. <b style="color:#b71c1c;">-0.3%</b>. -->
+
+<tr><td style="padding:12px 22px 4px 22px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="6"><tr>
+<td align="center" style="background:#fdecea;border-radius:6px;padding:10px;"><div style="font-size:22px;font-weight:bold;color:#b71c1c;">{{n_urgent}}</div><div style="font-size:11px;color:#b71c1c;">NEEDS ATTENTION</div></td>
+<td align="center" style="background:#fff4e0;border-radius:6px;padding:10px;"><div style="font-size:22px;font-weight:bold;color:#9a5b00;">{{n_watch}}</div><div style="font-size:11px;color:#9a5b00;">WATCH</div></td>
+<td align="center" style="background:#e8f1fd;border-radius:6px;padding:10px;"><div style="font-size:22px;font-weight:bold;color:#0d47a1;">{{n_info}}</div><div style="font-size:11px;color:#0d47a1;">INFO</div></td>
+<td align="center" style="background:#f3f4f6;border-radius:6px;padding:10px;"><div style="font-size:22px;font-weight:bold;color:#4b5563;">{{n_quiet}}</div><div style="font-size:11px;color:#4b5563;">QUIET</div></td>
+</tr></table>
+</td></tr>
+
+<!-- NEEDS ATTENTION: one card per item. Fields: Reported / Why it matters / Likely impact / Check next. -->
+<tr><td style="padding:14px 22px 0 22px;">
+<div style="background:#b71c1c;color:#ffffff;padding:8px 12px;border-radius:6px 6px 0 0;font-size:13px;font-weight:bold;">&#9888; NEEDS ATTENTION</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #f5c2c0;border-top:none;border-radius:0 0 6px 6px;background:#fffafa;">
+<tr><td style="padding:12px;">
+<div style="font-size:15px;font-weight:bold;">{{stock}} <span style="background:#d1fae5;color:#065f46;font-size:11px;padding:2px 7px;border-radius:10px;margin-left:6px;">{{Verified|Unverified}}</span> <span style="color:#b71c1c;font-size:12px;margin-left:6px;">&#9660; Negative</span></div>
+<div style="font-size:12px;color:#6b7280;margin:2px 0 8px 0;">{{holding at Tiger/DBS or watchlist; no amounts}}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;line-height:1.45;">
+<tr><td width="92" valign="top" style="color:#6b7280;padding:2px 0;">Reported</td><td>{{what, with source name}}</td></tr>
+<tr><td valign="top" style="color:#6b7280;padding:2px 0;">Why it matters</td><td>{{mechanism}}</td></tr>
+<tr><td valign="top" style="color:#6b7280;padding:2px 0;">Likely impact</td><td>{{direction, timeframe, conditional wording}}</td></tr>
+<tr><td valign="top" style="color:#6b7280;padding:2px 0;">Check next</td><td><b>{{one concrete action}}</b> {{details}}</td></tr>
+</table></td></tr></table>
+</td></tr>
+
+<!-- WATCH: table, one row per item. -->
+<tr><td style="padding:16px 22px 0 22px;">
+<div style="background:#b26a00;color:#ffffff;padding:8px 12px;border-radius:6px 6px 0 0;font-size:13px;font-weight:bold;">&#128065; WATCH</div>
+<table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="font-size:12.5px;line-height:1.4;border:1px solid #f3d9a8;border-top:none;background:#fffaf0;">
+<tr style="background:#fdebc8;color:#7c4a00;"><td width="16%"><b>Stock</b></td><td width="40%"><b>What and why</b></td><td width="16%"><b>Impact</b></td><td width="28%"><b>Check next</b></td></tr>
+<tr style="border-top:1px solid #f3d9a8;"><td valign="top"><b>{{stock}}</b></td><td valign="top">{{what and why}} {{status badge}}</td><td valign="top">{{arrow + word}}</td><td valign="top">{{check}}</td></tr>
+</table>
+</td></tr>
+
+<!-- INFO: two-column table, stock and one-to-two sentences. -->
+<tr><td style="padding:16px 22px 0 22px;">
+<div style="background:#0d47a1;color:#ffffff;padding:8px 12px;border-radius:6px 6px 0 0;font-size:13px;font-weight:bold;">&#8505; INFO</div>
+<table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="font-size:12.5px;line-height:1.4;border:1px solid #bcd3f5;border-top:none;background:#f7faff;">
+<tr><td width="16%" valign="top"><b>{{stock}}</b></td><td>{{one to two sentences}}</td></tr>
+</table>
+</td></tr>
+
+<!-- QUIET: one line listing stocks with nothing notable. -->
+<tr><td style="padding:16px 22px 0 22px;">
+<div style="background:#4b5563;color:#ffffff;padding:8px 12px;border-radius:6px 6px 0 0;font-size:13px;font-weight:bold;">QUIET</div>
+<div style="border:1px solid #d1d5db;border-top:none;background:#f9fafb;padding:10px 12px;font-size:12.5px;line-height:1.5;color:#374151;">No notable news: <b>{{list}}</b>.</div>
+</td></tr>
+
+<tr><td style="padding:16px 22px 20px 22px;">
+<div style="font-size:12px;color:#6b7280;line-height:1.5;">
+<b style="color:#374151;">Verification:</b> {{what could not be confirmed, which sources failed this run}}<br>
+<b style="color:#374151;">Coverage:</b> news (2 engines), SEC filings, Federal Register, Reddit mention counts only. X not covered.<br>
+Facts and context only, not buy/sell advice. Decisions are yours.
+</div></td></tr>
+</table></div>
